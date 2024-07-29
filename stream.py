@@ -1909,30 +1909,11 @@ if uploaded_file is not None:
             final_df = pd.concat(df_concat)
             time_now = dt.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
             st.markdown('### Output')
-            def to_excel(df):
-                output = io.BytesIO()
-                with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
-                    df.to_excel(writer, index=False, sheet_name='Sheet1')
-            
-                    # Mengakses workbook dan worksheet untuk format header
-                    workbook = writer.book
-                    worksheet = writer.sheets['Sheet1']
-                    
-                    # Menambahkan format khusus untuk header
-                    header_format = workbook.add_format({'border': 0, 'bold': False, 'font_size': 12})
-                    
-                    # Menulis header manual dengan format khusus
-                    for col_num, value in enumerate(df.columns.values):
-                        worksheet.write(0, col_num, value, header_format)
-                        
-                processed_data = output.getvalue()
-                return processed_data
-                
             zip_buffer = io.BytesIO()
             with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
-                zip_file.writestr(f'INVOICE_{time_now}.xlsx', to_excel(invoice_final))
-                zip_file.writestr(f'WEB_{time_now}.xlsx', to_excel(web_final))
-                zip_file.writestr(f'BREAKDOWN_{time_now}.xlsx', to_excel(final_df))
+                zip_file.writestr(f'INVOICE_{time_now}.csv', invoice_final.to_csv(index=False))
+                zip_file.writestr(f'WEB_{time_now}.csv', web_final.to_csv(index=False))
+                zip_file.writestr(f'BREAKDOWN_{time_now}.csv', final_df.to_csv(index=False))
             
             # Pastikan buffer ZIP berada di awal
             zip_buffer.seek(0)
